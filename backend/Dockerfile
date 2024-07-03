@@ -23,10 +23,14 @@ ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
 
 WORKDIR /usr/src/app
 COPY package*.json ./
-RUN npm install
+RUN npm install \
+    && rm -rf /usr/src/app/node_modules/@types/lodash
+
+
 
 COPY . .
 RUN npm run build
+
 
 ENV NODE_ENV=production
 ENV PORT=3000

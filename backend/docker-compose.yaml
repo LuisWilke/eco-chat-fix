@@ -5,10 +5,10 @@ networks:
 
 services:
 
-  backend:
-    build:
-      context: ./backend
-      dockerfile: ./Dockerfile
+  app:
+    image: node:14-alpine
+    working_dir: /home/node/app
+    command: sh -c "npm i && npm run dev:server"
     environment:
       - DB_HOST=mysql
       - DB_USER=root
@@ -21,30 +21,15 @@ services:
       - PROXY_PORT=${PROXY_PORT:-8080}
       - CHROME_ARGS=--no-sandbox --disable-setuid-sandbox
     ports:
-      - ${BACKEND_PORT:-8080}:3000
+      - 3003:3003
     volumes:
-      - ./backend/public/:/usr/src/app/public/
-      - ./backend/.wwebjs_auth/:/usr/src/app/.wwebjs_auth/
+      - ./public/:/usr/src/app/public/
+      - ./.wwebjs_auth/:/usr/src/app/.wwebjs_auth/
+      - .:/home/node/app
     networks:
       - whaticket
-
-  frontend:
-    ports:
-      - ${FRONTEND_PORT:-3000}:80
-      - ${FRONTEND_SSL_PORT:-3001}:443
-    build:
-      context: ./frontend
-      dockerfile: ./Dockerfile
-    environment:
-      - URL_BACKEND=backend:3000
-      - REACT_APP_BACKEND_URL=${BACKEND_URL:-http://localhost}:${PROXY_PORT:-8080}/
-      - FRONTEND_SERVER_NAME=${FRONTEND_SERVER_NAME}
-      - BACKEND_SERVER_NAME=${BACKEND_SERVER_NAME}
-    volumes:
-      - ./ssl/certs/:/etc/nginx/ssl/
-      - ./ssl/www/:/var/www/letsencrypt/
-    networks:
-      - whaticket
+    depends_on:
+      - mysql
 
   mysql:
     image: ${MYSQL_ENGINE:-mariadb}:${MYSQL_VERSION:-10.6}

@@ -33,10 +33,10 @@ RUN npm run build
 
 
 ENV NODE_ENV=production
-ENV PORT=3000
+ENV PORT=3003
 ENV CHROME_BIN=google-chrome-stable
 
-EXPOSE 3000
+EXPOSE 3003
 
 ENTRYPOINT ["dumb-init", "--"]
 CMD dockerize -wait tcp://${DB_HOST}:3306 \
